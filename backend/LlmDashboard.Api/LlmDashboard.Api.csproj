@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+      <UserSecretsId>dc686a19-0771-40ea-820c-44b5a2168198</UserSecretsId>
+  </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.1">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\LlmDashboard.Domain\LlmDashboard.Domain.csproj" />
+      <ProjectReference Include="..\LlmDashboard.Infrastructure\LlmDashboard.Infrastructure.csproj" />
+    </ItemGroup>
+
+</Project>

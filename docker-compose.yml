@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: LlmDashboard.Api/Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+    depends_on:
+      - postgres
+    networks:
+      - llm-dashboard-network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: llm-dashboard-postgres
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - llm-dashboard-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-data:
+
+networks:
+  llm-dashboard-network:
+    driver: bridge
