@@ -19,4 +19,13 @@
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Include="..\..\.env">
+        <Link>.env</Link>
+      </Content>
+      <Content Include="..\..\.env.example">
+        <Link>.env.example</Link>
+      </Content>
+    </ItemGroup>
+
 </Project>
