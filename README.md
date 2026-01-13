@@ -63,7 +63,51 @@ To clear all secrets:
 dotnet user-secrets clear
 ```
 
-### 3. Running with Docker Compose
+### 3. Database Migrations
+
+The project uses Entity Framework Core for database migrations. Before running the application, you need to create and apply migrations.
+
+Navigate to the Infrastructure project directory:
+
+```bash
+cd backend/LlmDashboard.Infrastructure
+```
+
+Create a new migration:
+
+```bash
+dotnet ef migrations add InitialCreate --startup-project ../LlmDashboard.Api
+```
+
+Apply migrations to the database:
+
+```bash
+dotnet ef database update --startup-project ../LlmDashboard.Api
+```
+
+**Important Notes:**
+- Make sure PostgreSQL is running before applying migrations (either via Docker or locally)
+- The `--startup-project` flag is required because migrations are in Infrastructure but the connection string is configured in the API project
+- For local development, ensure your user secrets are configured before running migrations
+
+Common migration commands:
+
+List all migrations:
+```bash
+dotnet ef migrations list --startup-project ../LlmDashboard.Api
+```
+
+Remove the last migration (before applying it):
+```bash
+dotnet ef migrations remove --startup-project ../LlmDashboard.Api
+```
+
+Generate SQL script for a migration:
+```bash
+dotnet ef migrations script --startup-project ../LlmDashboard.Api
+```
+
+### 4. Running with Docker Compose
 
 Start all services (API + PostgreSQL):
 
@@ -91,7 +135,7 @@ To remove volumes (this will delete database data):
 docker-compose down -v
 ```
 
-### 4. Running Locally (Development)
+### 5. Running Locally (Development)
 
 If you want to run the API locally while using the Dockerized PostgreSQL:
 
@@ -119,3 +163,13 @@ The API will use the connection string from user secrets (pointing to `localhost
 ├── .env.example                    # Environment template
 └── docker-compose.yml              # Docker services configuration
 ```
+
+## Database Configuration
+
+The project uses Entity Framework Core with PostgreSQL and includes the following features:
+
+- **PostgreSQL with Npgsql provider** - Optimized for PostgreSQL databases
+- **Snake case naming convention** - All table and column names use snake_case (e.g., `created_at`, `updated_at`)
+- **Automatic retry on failure** - Configured with 3 retry attempts with 30-second max delay
+- **Entity configurations** - Fluent API configurations in `Infrastructure/Configurations/` folder
+- **Migration assembly** - Migrations are stored in the Infrastructure project
