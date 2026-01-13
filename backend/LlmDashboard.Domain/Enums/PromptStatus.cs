@@ -2,8 +2,9 @@ namespace LlmDashboard.Domain.Enums;
 
 public enum PromptStatus
 {
-    Pending,
-    Processing,
-    Completed,
-    Failed,
+    None = 0,
+    Pending = 1,
+    Processing = 2,
+    Completed = 3,
+    Failed = -1,
 }

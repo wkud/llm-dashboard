@@ -1,13 +1,13 @@
-﻿using LlmDashboard.Domain.Enums;
+using LlmDashboard.Domain.Enums;
 
-namespace LlmDashboard.Domain;
+namespace LlmDashboard.Api.Dtos;
 
-public class Prompt
+public record PromptDto
 {
     public required Guid Id { get; set; }
     public required string Text { get; set; }
     public required PromptStatus Status { get; set; }
-    
+
     public required DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }
