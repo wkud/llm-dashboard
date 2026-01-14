@@ -1,6 +1,74 @@
 @Api_HostAddress = http://localhost:8080
+@PromptId = 00000000-0000-0000-0000-000000000000
 
-GET {{Api_HostAddress}}/prompt/
+### Create a new prompt (Pending)
+POST {{Api_HostAddress}}/api/prompt
+Content-Type: application/json
+
+{
+  "text": "Explain the concept of dependency injection in simple terms",
+  "status": "Pending"
+}
+
+###
+
+### Create another prompt (Processing)
+POST {{Api_HostAddress}}/api/prompt
+Content-Type: application/json
+
+{
+  "text": "Write a function to calculate fibonacci numbers",
+  "status": "Processing"
+}
+
+###
+
+### Get all prompts
+GET {{Api_HostAddress}}/api/prompt
 Accept: application/json
+
+###
+
+### Get prompt by ID (replace with actual ID from create response)
+GET {{Api_HostAddress}}/api/prompt/{{PromptId}}
+Accept: application/json
+
+###
+
+### Update prompt by ID (replace with actual ID)
+PUT {{Api_HostAddress}}/api/prompt/{{PromptId}}
+Content-Type: application/json
+
+{
+  "text": "Explain the concept of dependency injection with code examples",
+  "status": "Completed"
+}
+
+###
+
+### Delete prompt by ID (replace with actual ID)
+DELETE {{Api_HostAddress}}/api/prompt/{{PromptId}}
+
+###
+
+### Test 404 - Get non-existent prompt
+GET {{Api_HostAddress}}/api/prompt/99999999-9999-9999-9999-999999999999
+Accept: application/json
+
+###
+
+### Test 404 - Update non-existent prompt
+PUT {{Api_HostAddress}}/api/prompt/99999999-9999-9999-9999-999999999999
+Content-Type: application/json
+
+{
+  "text": "This should return 404",
+  "status": "Failed"
+}
+
+###
+
+### Test 404 - Delete non-existent prompt
+DELETE {{Api_HostAddress}}/api/prompt/99999999-9999-9999-9999-999999999999
 
 ###
