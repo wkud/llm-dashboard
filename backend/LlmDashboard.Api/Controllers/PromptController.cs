@@ -11,15 +11,19 @@ namespace LlmDashboard.Api.Controllers;
 public class PromptController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly ILogger<PromptController> _logger;
 
-    public PromptController(ApplicationDbContext context)
+    public PromptController(ApplicationDbContext context, ILogger<PromptController> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     [HttpPost]
     public async Task<ActionResult<PromptDto>> Create([FromBody] CreatePromptDto createDto)
     {
+        _logger.LogInformation("Creating new prompt with status: {Status}", createDto.Status);
+
         var prompt = new Prompt
         {
             Id = Guid.NewGuid(),
@@ -31,6 +35,8 @@ public class PromptController : ControllerBase
 
         _context.Prompts.Add(prompt);
         await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Successfully created prompt with ID: {PromptId}", prompt.Id);
 
         var promptDto = new PromptDto
         {
@@ -47,12 +53,17 @@ public class PromptController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<PromptDto>> GetById(Guid id)
     {
+        _logger.LogDebug("Fetching prompt with ID: {PromptId}", id);
+
         var prompt = await _context.Prompts.FindAsync(id);
 
         if (prompt is null)
         {
+            _logger.LogWarning("Prompt with ID: {PromptId} not found", id);
             return NotFound();
         }
+
+        _logger.LogDebug("Successfully retrieved prompt with ID: {PromptId}", id);
 
         var promptDto = new PromptDto
         {
@@ -69,9 +80,13 @@ public class PromptController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PromptDto>>> GetMany()
     {
+        _logger.LogDebug("Fetching all prompts");
+
         var prompts = await _context.Prompts
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
+
+        _logger.LogInformation("Retrieved {Count} prompts", prompts.Count);
 
         var promptDtos = prompts.Select(p => new PromptDto
         {
@@ -88,10 +103,13 @@ public class PromptController : ControllerBase
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<PromptDto>> Update(Guid id, [FromBody] UpdatePromptDto updateDto)
     {
+        _logger.LogInformation("Updating prompt with ID: {PromptId}", id);
+
         var prompt = await _context.Prompts.FindAsync(id);
 
         if (prompt is null)
         {
+            _logger.LogWarning("Prompt with ID: {PromptId} not found for update", id);
             return NotFound();
         }
 
@@ -100,6 +118,8 @@ public class PromptController : ControllerBase
         prompt.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Successfully updated prompt with ID: {PromptId}", id);
 
         var promptDto = new PromptDto
         {
@@ -116,15 +136,20 @@ public class PromptController : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
+        _logger.LogInformation("Deleting prompt with ID: {PromptId}", id);
+
         var prompt = await _context.Prompts.FindAsync(id);
 
         if (prompt is null)
         {
+            _logger.LogWarning("Prompt with ID: {PromptId} not found for deletion", id);
             return NotFound();
         }
 
         _context.Prompts.Remove(prompt);
         await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Successfully deleted prompt with ID: {PromptId}", id);
 
         return NoContent();
     }

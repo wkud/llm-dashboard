@@ -173,3 +173,39 @@ The project uses Entity Framework Core with PostgreSQL and includes the followin
 - **Automatic retry on failure** - Configured with 3 retry attempts with 30-second max delay
 - **Entity configurations** - Fluent API configurations in `Infrastructure/Configurations/` folder
 - **Migration assembly** - Migrations are stored in the Infrastructure project
+
+## Logging
+
+The project uses Serilog for structured logging. All log files are written with daily rolling and automatic cleanup.
+
+**Log Locations:**
+- **Local Development**: `backend/LlmDashboard.Api/logs/log-YYYYMMDD.txt`
+- **Docker/Production**: `logs/log-YYYYMMDD.txt` (inside the container at `/app/logs/`)
+
+**Log Levels:**
+- Development: Debug level (includes EF Core SQL queries)
+- Production: Information level
+
+**Development Guidelines:**
+When writing new code, use `ILogger<T>` for logging. Inject the logger via constructor and use structured logging with named parameters:
+
+```csharp
+public class MyController : ControllerBase
+{
+    private readonly ILogger<MyController> _logger;
+
+    public MyController(ILogger<MyController> logger)
+    {
+        _logger = logger;
+    }
+
+    public void MyMethod(Guid id)
+    {
+        _logger.LogInformation("Processing item with ID: {ItemId}", id);
+        
+        // process the item
+        
+        _logger.LogInformation("Processed item with ID: {ItemId}", id);
+    }
+}
+```
