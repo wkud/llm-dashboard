@@ -30,8 +30,7 @@ public class PromptConfiguration : IEntityTypeConfiguration<Prompt>
             .IsRequired();
 
         builder.Property(p => p.UpdatedAt)
-            .HasColumnName("updated_at")
-            .IsRequired();
+            .HasColumnName("updated_at");
 
         builder.HasIndex(p => p.Status);
         builder.HasIndex(p => p.CreatedAt);
