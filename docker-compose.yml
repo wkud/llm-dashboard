@@ -14,7 +14,7 @@ services:
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
     depends_on:
       - postgres
-      - work-queue
+      - rabbitmq
     networks:
       - llm-dashboard-network
 
@@ -25,12 +25,12 @@ services:
     environment:
       - DOTNET_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
-      - RabbitMQ__Host=work-queue
+      - RabbitMQ__Host=rabbitmq
       - RabbitMQ__Username=${RABBITMQ_USER:-guest}
       - RabbitMQ__Password=${RABBITMQ_PASSWORD:-guest}
     depends_on:
       - postgres
-      - work-queue
+      - rabbitmq
     networks:
       - llm-dashboard-network
 
@@ -53,7 +53,7 @@ services:
       timeout: 5s
       retries: 5
 
-  work-queue:
+  rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: llm-dashboard-rabbitmq
     environment:
