@@ -1,3 +1,4 @@
+using LlmDashboard.Infrastructure;
 using LlmDashboard.Processor;
 using MassTransit;
 using Serilog;
@@ -6,6 +7,8 @@ var builder = Host.CreateApplicationBuilder(args);
 
 builder.Services.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
+
+builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddMassTransit(x =>
 {

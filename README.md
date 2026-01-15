@@ -29,24 +29,20 @@ Edit `.env` with your preferred credentials. The `.env` file is used by Docker C
 
 ### 2. .NET User Secrets Setup (Local Development)
 
-For running the API locally outside of Docker, you need to configure .NET user secrets with the database connection string.
+For running projects locally outside of Docker, configure .NET user secrets.
 
-Navigate to the API project directory:
-
+**API project:**
 ```bash
 cd backend/LlmDashboard.Api
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5433;Database=llmdashboard;Username=llmuser;Password=change_this_password"
 ```
 
-Initialize user secrets for the project:
-
+**Processor project:**
 ```bash
-dotnet user-secrets init
-```
-
-Set the database connection string (update values to match your `.env` file):
-
-```bash
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=llmdashboard;Username=llmuser;Password=change_this_password"
+cd backend/LlmDashboard.Processor
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5433;Database=llmdashboard;Username=llmuser;Password=change_this_password"
+dotnet user-secrets set "RabbitMQ:Username" "guest"
+dotnet user-secrets set "RabbitMQ:Password" "guest"
 ```
 
 **Important Notes:**
@@ -183,7 +179,8 @@ The API will use the connection string from user secrets (pointing to `localhost
 ```
 ├── backend/
 │   ├── LlmDashboard.Api/          # Web API project
-│   ├── LlmDashboard.Processor/    # Background worker for processing tasks
+│   ├── LlmDashboard.Processor/    # Background worker
+│   ├── LlmDashboard.Contracts/    # Shared message contracts
 │   ├── LlmDashboard.Domain/       # Domain models
 │   └── LlmDashboard.Infrastructure/ # Data access & infrastructure
 ├── .env                            # Environment variables (not in git)
@@ -220,35 +217,34 @@ The API will use the connection string from user secrets (pointing to `localhost
                 └──────────│ LlmDashboard.Processor │
                            └────────────────────────┘
                                       │
-                           ┌──────────┴──────────┐
-                           ▼                     ▼
-                  ┌─────────────────┐  ┌──────────────────┐
-                  │     Domain      │  │  Infrastructure  │
-                  │  (Shared libs)  │  │  (Shared libs)   │
-                  └─────────────────┘  └──────────────────┘
+                           ┌──────────┴──────────┬──────────┐
+                           ▼                     ▼          ▼
+                  ┌──────────────┐  ┌──────────────────┐  ┌──────────────┐
+                  │   Contracts  │  │  Infrastructure  │  │    Domain    │
+                  │(Shared libs) │  │  (Shared libs)   │  │(Shared libs) │
+                  └──────────────┘  └──────────────────┘  └──────────────┘
 ```
 
 **LlmDashboard.Api** - REST API
-- Handles HTTP requests
-- Exposes CRUD endpoints for prompts
-- Publishes messages to RabbitMQ for background processing
+- CRUD endpoints for prompts
+- Publishes messages to RabbitMQ via MassTransit
+- Serilog logging to console and file
 
 **LlmDashboard.Processor** - Background Worker
-- Console application running as a service
-- Consumes messages from RabbitMQ
+- Consumes messages from RabbitMQ via MassTransit
 - Processes long-running tasks asynchronously
-- Accesses database via Infrastructure layer
+- Serilog logging to console and file
+
+**LlmDashboard.Contracts** - Message Contracts
+- Shared message definitions for MassTransit
+- Used by both API and Processor
 
 **LlmDashboard.Domain** - Domain Models
-- Shared domain entities (Prompt, etc.)
-- Enums and value objects
-- Business logic and domain rules
+- Domain entities (Prompt, etc.) and enums
 
 **LlmDashboard.Infrastructure** - Data Access
-- Entity Framework Core DbContext
-- Database configurations
-- Migrations
-- Repository implementations
+- Entity Framework Core with PostgreSQL
+- Database configurations and migrations
 
 ## Database Configuration
 
@@ -262,15 +258,16 @@ The project uses Entity Framework Core with PostgreSQL and includes the followin
 
 ## Logging
 
-The project uses Serilog for structured logging. All log files are written with daily rolling and automatic cleanup.
+Both API and Processor use Serilog for structured logging with daily rolling files and automatic cleanup.
 
 **Log Locations:**
-- **Local Development**: `backend/LlmDashboard.Api/logs/log-YYYYMMDD.txt`
-- **Docker/Production**: `logs/log-YYYYMMDD.txt` (inside the container at `/app/logs/`)
+- **API Local**: `backend/LlmDashboard.Api/logs/log-YYYYMMDD.txt`
+- **Processor Local**: `backend/LlmDashboard.Processor/logs/log-YYYYMMDD.txt`
+- **Docker**: `logs/log-YYYYMMDD.txt` (inside containers at `/app/logs/`)
 
 **Log Levels:**
-- Development: Debug level (includes EF Core SQL queries)
-- Production: Information level
+- Development: Debug (includes EF Core SQL queries)
+- Production: Information
 
 **Development Guidelines:**
 When writing new code, use `ILogger<T>` for logging. Inject the logger via constructor and use structured logging with named parameters:
