@@ -6,8 +6,8 @@ using Serilog;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.Services.UseSerilog((context, configuration) =>
-    configuration.ReadFrom.Configuration(context.Configuration));
+builder.Services.AddSerilog((services, loggerConfiguration) =>
+    loggerConfiguration.ReadFrom.Configuration(builder.Configuration));
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();

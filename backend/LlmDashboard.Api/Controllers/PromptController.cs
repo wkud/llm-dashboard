@@ -1,4 +1,5 @@
 using LlmDashboard.Api.Dtos;
+using LlmDashboard.Application.Dtos.Prompt;
 using LlmDashboard.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,10 +21,7 @@ public class PromptController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<PromptDto>> Create([FromBody] CreatePromptDto dto)
     {
-        _logger.LogInformation("Creating new prompt with status: {Status}", dto.Status);
-
         var promptDto = await _service.CreateAsync(dto);
-
         return CreatedAtAction(nameof(GetById), new { id = promptDto.Id }, promptDto);
     }
 

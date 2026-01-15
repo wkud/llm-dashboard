@@ -1,6 +1,6 @@
-using LlmDashboard.Domain;
+using LlmDashboard.Domain.Models;
 
-namespace LlmDashboard.Application.Repositories;
+namespace LlmDashboard.Application.Abstractions;
 
 public interface IPromptRepository
 {

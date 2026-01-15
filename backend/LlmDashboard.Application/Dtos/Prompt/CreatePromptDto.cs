@@ -1,9 +1,6 @@
-using LlmDashboard.Domain.Enums;
-
-namespace LlmDashboard.Api.Dtos;
+namespace LlmDashboard.Application.Dtos.Prompt;
 
 public record CreatePromptDto
 {
     public required string Text { get; init; }
-    public required PromptStatus Status { get; init; }
 }

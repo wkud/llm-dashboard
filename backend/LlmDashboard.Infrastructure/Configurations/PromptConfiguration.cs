@@ -1,3 +1,5 @@
+using LlmDashboard.Domain.Models;
+
 namespace LlmDashboard.Infrastructure.Configurations;
 
 using LlmDashboard.Domain;

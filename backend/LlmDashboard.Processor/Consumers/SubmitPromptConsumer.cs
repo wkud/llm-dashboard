@@ -1,57 +1,61 @@
+using LlmDashboard.Application.Services;
 using LlmDashboard.Contracts.Messages;
-using LlmDashboard.Domain.Enums;
-using LlmDashboard.Infrastructure;
+using LlmDashboard.Contracts.Messages.Prompts;
 using LlmDashboard.Processor.Clients;
 using MassTransit;
+using Microsoft.Extensions.Logging;
 
 namespace LlmDashboard.Processor.Consumers;
 
 public class SubmitPromptConsumer : IConsumer<SubmitPromptCommand>
 {
-    private readonly ApplicationDbContext _db;
+    private readonly IPromptService _promptService;
     private readonly ILlmClient _llm;
     private readonly ILogger<SubmitPromptConsumer> _logger;
 
-    public SubmitPromptConsumer(ApplicationDbContext db, ILlmClient llm, ILogger<SubmitPromptConsumer> logger)
+    public SubmitPromptConsumer(
+        IPromptService promptService,
+        ILlmClient llm,
+        ILogger<SubmitPromptConsumer> logger)
     {
-        _db = db;
+        _promptService = promptService;
         _llm = llm;
         _logger = logger;
     }
 
     public async Task Consume(ConsumeContext<SubmitPromptCommand> context)
     {
-        var prompt = await _db.Prompts.FindAsync(context.Message.PromptId);
+        var promptId = context.Message.PromptId;
 
-        if (prompt == null)
+        _logger.LogDebug("Processing prompt {PromptId}", promptId);
+
+        var promptDto = await _promptService.GetByIdAsync(promptId);
+
+        if (promptDto == null)
         {
-            _logger.LogWarning("Prompt {PromptId} not found", context.Message.PromptId);
+            _logger.LogWarning("Prompt {PromptId} not found", promptId);
             return;
         }
 
-        // Idempotency guard
-        if (prompt.Status != PromptStatus.Pending)
+        if (promptDto.Status != Domain.Enums.PromptStatus.Pending)
         {
-            _logger.LogInformation("Prompt {PromptId} already processed or in progress", prompt.Id);
+            _logger.LogInformation("Prompt {PromptId} already processed or in progress", promptId);
             return;
         }
 
         try
         {
-            prompt.MarkProcessing();
-            await _db.SaveChangesAsync();
+            await _promptService.MarkProcessingAsync(promptId);
 
-            var result = await _llm.ProcessAsync(prompt.InputText);
+            var result = await _llm.ProcessAsync(promptDto.Text);
 
-            prompt.MarkCompleted(result);
-            await _db.SaveChangesAsync();
+            await _promptService.MarkCompletedAsync(promptId, result);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed processing prompt {PromptId}", prompt.Id);
+            _logger.LogError(ex, "Failed processing prompt {PromptId}", promptId);
 
-            prompt.MarkFailed(ex.Message);
-            await _db.SaveChangesAsync();
+            await _promptService.MarkFailedAsync(promptId, ex.Message);
 
             throw; // Let MassTransit handle retry / error queue
         }

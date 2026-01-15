@@ -1,4 +1,5 @@
-using LlmDashboard.Application.Repositories;
+using LlmDashboard.Application.Abstractions;
+using LlmDashboard.Infrastructure.Messaging;
 using LlmDashboard.Infrastructure.Repositories;
 
 namespace LlmDashboard.Infrastructure;
@@ -26,6 +27,7 @@ public static class DependencyInjection
             .UseSnakeCaseNamingConvention());
 
         services.AddScoped<IPromptRepository, PromptRepository>();
+        services.AddScoped<IEventBus, MassTransitEventBus>();
         
         return services;
     }

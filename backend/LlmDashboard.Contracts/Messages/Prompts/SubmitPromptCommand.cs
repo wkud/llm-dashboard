@@ -1,4 +1,4 @@
-﻿namespace LlmDashboard.Contracts.Messages;
+﻿namespace LlmDashboard.Contracts.Messages.Prompts;
 
 public record SubmitPromptCommand
 {

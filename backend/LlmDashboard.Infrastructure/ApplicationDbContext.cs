@@ -1,4 +1,6 @@
-﻿namespace LlmDashboard.Infrastructure;
+﻿using LlmDashboard.Domain.Models;
+
+namespace LlmDashboard.Infrastructure;
 
 using LlmDashboard.Domain;
 using Microsoft.EntityFrameworkCore;
