@@ -1,3 +1,6 @@
+using LlmDashboard.Application.Repositories;
+using LlmDashboard.Infrastructure.Repositories;
+
 namespace LlmDashboard.Infrastructure;
 
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +25,8 @@ public static class DependencyInjection
             })
             .UseSnakeCaseNamingConvention());
 
+        services.AddScoped<IPromptRepository, PromptRepository>();
+        
         return services;
     }
 }

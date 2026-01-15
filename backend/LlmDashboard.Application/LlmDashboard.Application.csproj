@@ -2,7 +2,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\LlmDashboard.Domain\LlmDashboard.Domain.csproj" />
-      <ProjectReference Include="..\LlmDashboard.Infrastructure\LlmDashboard.Infrastructure.csproj" />
     </ItemGroup>
 
     <PropertyGroup>

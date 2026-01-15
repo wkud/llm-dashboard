@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using LlmDashboard.Application;
 using LlmDashboard.Infrastructure;
 using Serilog;
 
@@ -24,6 +25,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
 
 var app = builder.Build();
 
