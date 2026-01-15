@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LlmDashboard.Processor", "L
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LlmDashboard.Contracts", "LlmDashboard.Contracts\LlmDashboard.Contracts.csproj", "{66925B9C-C219-4ED4-B1C6-4C07F9238094}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LlmDashboard.Application", "LlmDashboard.Application\LlmDashboard.Application.csproj", "{2A368DF7-C60D-4FF9-95D7-B7557486051F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{66925B9C-C219-4ED4-B1C6-4C07F9238094}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66925B9C-C219-4ED4-B1C6-4C07F9238094}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66925B9C-C219-4ED4-B1C6-4C07F9238094}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A368DF7-C60D-4FF9-95D7-B7557486051F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A368DF7-C60D-4FF9-95D7-B7557486051F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A368DF7-C60D-4FF9-95D7-B7557486051F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A368DF7-C60D-4FF9-95D7-B7557486051F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

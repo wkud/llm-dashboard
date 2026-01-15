@@ -6,6 +6,8 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["LlmDashboard.Processor/LlmDashboard.Processor.csproj", "LlmDashboard.Processor/"]
+COPY ["LlmDashboard.Application/LlmDashboard.Application.csproj", "LlmDashboard.Application/"]
+COPY ["LlmDashboard.Contracts/LlmDashboard.Contracts.csproj", "LlmDashboard.Contracts/"]
 COPY ["LlmDashboard.Domain/LlmDashboard.Domain.csproj", "LlmDashboard.Domain/"]
 COPY ["LlmDashboard.Infrastructure/LlmDashboard.Infrastructure.csproj", "LlmDashboard.Infrastructure/"]
 RUN dotnet restore "LlmDashboard.Processor/LlmDashboard.Processor.csproj"
