@@ -180,6 +180,7 @@ The API will use the connection string from user secrets (pointing to `localhost
 ├── backend/
 │   ├── LlmDashboard.Api/          # Web API project
 │   ├── LlmDashboard.Processor/    # Background worker
+│   ├── LlmDashboard.Application/  # Business logic & services
 │   ├── LlmDashboard.Contracts/    # Shared message contracts
 │   ├── LlmDashboard.Domain/       # Domain models
 │   └── LlmDashboard.Infrastructure/ # Data access & infrastructure
@@ -217,12 +218,12 @@ The API will use the connection string from user secrets (pointing to `localhost
                 └──────────│ LlmDashboard.Processor │
                            └────────────────────────┘
                                       │
-                           ┌──────────┴──────────┬──────────┐
-                           ▼                     ▼          ▼
-                  ┌──────────────┐  ┌──────────────────┐  ┌──────────────┐
-                  │   Contracts  │  │  Infrastructure  │  │    Domain    │
-                  │(Shared libs) │  │  (Shared libs)   │  │(Shared libs) │
-                  └──────────────┘  └──────────────────┘  └──────────────┘
+                           ┌──────────┴──────────┬──────────┬────────────────────┐
+                           ▼                     ▼          ▼                    ▼
+                  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐  ┌──────────────┐
+                  │  Application │  │  Contracts   │  │  Infrastructure  │  │    Domain    │
+                  │(Shared libs) │  │(Shared libs) │  │  (Shared libs)   │  │(Shared libs) │
+                  └──────────────┘  └──────────────┘  └──────────────────┘  └──────────────┘
 ```
 
 **LlmDashboard.Api** - REST API
@@ -234,6 +235,11 @@ The API will use the connection string from user secrets (pointing to `localhost
 - Consumes messages from RabbitMQ via MassTransit
 - Processes long-running tasks asynchronously
 - Serilog logging to console and file
+
+**LlmDashboard.Application** - Business Logic
+- Service layer for API and Processor operations
+- Decoupled business logic from controllers and consumers
+- Orchestrates Domain and Infrastructure layers
 
 **LlmDashboard.Contracts** - Message Contracts
 - Shared message definitions for MassTransit
