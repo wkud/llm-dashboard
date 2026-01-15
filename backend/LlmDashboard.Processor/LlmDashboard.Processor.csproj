@@ -9,16 +9,28 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="MassTransit" Version="9.0.0" />
+        <PackageReference Include="MassTransit.RabbitMQ" Version="9.0.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2"/>
+        <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+        <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     </ItemGroup>
 
     <ItemGroup>
       <Content Include="..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
+      <Content Update="appsettings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Update="appsettings.Development.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\LlmDashboard.Contracts\LlmDashboard.Contracts.csproj" />
       <ProjectReference Include="..\LlmDashboard.Domain\LlmDashboard.Domain.csproj" />
       <ProjectReference Include="..\LlmDashboard.Infrastructure\LlmDashboard.Infrastructure.csproj" />
     </ItemGroup>
