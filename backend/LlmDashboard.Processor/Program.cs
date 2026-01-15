@@ -1,6 +1,7 @@
 using LlmDashboard.Application;
 using LlmDashboard.Infrastructure;
 using LlmDashboard.Processor;
+using LlmDashboard.Processor.Clients;
 using MassTransit;
 using Serilog;
 
@@ -34,7 +35,7 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
-builder.Services.AddHostedService<Worker>();
+builder.Services.AddScoped<ILlmClient, DummyLlmClient>();
 
 var host = builder.Build();
 

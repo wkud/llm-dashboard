@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using LlmDashboard.Application;
 using LlmDashboard.Infrastructure;
+using MassTransit;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +27,22 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
+
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        var rabbitMqHost = builder.Configuration["RabbitMQ:Host"] ?? "localhost";
+        var rabbitMqUsername = builder.Configuration["RabbitMQ:Username"] ?? "guest";
+        var rabbitMqPassword = builder.Configuration["RabbitMQ:Password"] ?? "guest";
+
+        cfg.Host(rabbitMqHost, h =>
+        {
+            h.Username(rabbitMqUsername);
+            h.Password(rabbitMqPassword);
+        });
+    });
+});
 
 var app = builder.Build();
 
