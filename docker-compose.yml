@@ -18,6 +18,22 @@ services:
     networks:
       - llm-dashboard-network
 
+  processor:
+    build:
+      context: ./backend
+      dockerfile: LlmDashboard.Processor/Dockerfile
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - RabbitMQ__Host=work-queue
+      - RabbitMQ__Username=${RABBITMQ_USER:-guest}
+      - RabbitMQ__Password=${RABBITMQ_PASSWORD:-guest}
+    depends_on:
+      - postgres
+      - work-queue
+    networks:
+      - llm-dashboard-network
+
   postgres:
     image: postgres:16-alpine
     container_name: llm-dashboard-postgres
