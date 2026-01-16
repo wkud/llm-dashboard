@@ -1,3 +1,4 @@
+using LlmDashboard.Application.Abstractions;
 using LlmDashboard.Application.Services;
 using LlmDashboard.Contracts.Messages.Prompts;
 using LlmDashboard.Domain.Enums;
