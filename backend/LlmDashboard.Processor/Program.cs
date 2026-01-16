@@ -22,6 +22,8 @@ builder.Services.Configure<OllamaOptions>(
 builder.Services.Configure<RabbitMqOptions>(
     builder.Configuration.GetSection(RabbitMqOptions.SectionName));
 
+builder.Services.Configure<DatabaseOptions>(
+    builder.Configuration.GetSection(DatabaseOptions.SectionName));
 
 builder.Services.AddHttpClient<ILlmClient, OllamaLlmClient>((sp, client) =>
 {
