@@ -6,7 +6,7 @@ class ApiService {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = `${API_BASE_URL}/api/prompt`;
+    this.baseUrl = `${API_BASE_URL}/api/Prompt`;
   }
 
   async getAllPrompts(): Promise<Prompt[]> {
@@ -35,6 +35,21 @@ class ApiService {
 
     if (!response.ok) {
       throw new Error(`Failed to create prompt: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  async getPromptById(id: string): Promise<Prompt> {
+    const response = await fetch(`${this.baseUrl}/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch prompt: ${response.statusText}`);
     }
 
     return response.json();

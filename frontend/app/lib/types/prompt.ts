@@ -1,9 +1,9 @@
 export enum PromptStatus {
-  None = 0,
-  Pending = 1,
-  Processing = 2,
-  Completed = 3,
-  Failed = -1,
+  None = 'None',
+  Pending = 'Pending',
+  Processing = 'Processing',
+  Completed = 'Completed',
+  Failed = 'Failed',
 }
 
 export interface Prompt {
