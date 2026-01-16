@@ -1,50 +1,85 @@
 'use client';
 
-import { Container, Typography, Box, Button, Paper } from '@mui/material';
-import { Dashboard as DashboardIcon } from '@mui/icons-material';
+import { useState, useEffect, useCallback } from 'react';
+import { Container, Box } from '@mui/material';
+import { Prompt } from './lib/types/prompt';
+import { apiService } from './lib/services/api';
+import Header from './components/Header';
+import NewPrompt from './components/NewPrompt';
+import PromptList from './components/PromptList';
+
+const POLLING_INTERVAL = 3000; // 3 seconds
 
 export default function Home() {
+  const [prompts, setPrompts] = useState<Prompt[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchPrompts = useCallback(async () => {
+    try {
+      const fetchedPrompts = await apiService.getAllPrompts();
+      // Sort by createdAt descending (newest first)
+      const sorted = fetchedPrompts.sort(
+        (a: Prompt, b: Prompt) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setPrompts(sorted);
+    } catch (error) {
+      console.error('Failed to fetch prompts:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const handleSubmitPrompt = useCallback(async (text: string) => {
+    setIsSubmitting(true);
+    try {
+      await apiService.createPrompt({ text });
+      // Refresh prompts after creating
+      await fetchPrompts();
+    } catch (error) {
+      console.error('Failed to submit prompt:', error);
+      throw error;
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [fetchPrompts]);
+
+  const handleDeletePrompt = useCallback(async (id: string) => {
+    try {
+      await apiService.deletePrompt(id);
+      // Refresh prompts after deleting
+      await fetchPrompts();
+    } catch (error) {
+      console.error('Failed to delete prompt:', error);
+      throw error;
+    }
+  }, [fetchPrompts]);
+
+  const handleRefresh = useCallback(() => {
+    fetchPrompts();
+  }, [fetchPrompts]);
+
+  // Initial fetch
+  useEffect(() => {
+    fetchPrompts();
+  }, [fetchPrompts]);
+
+  // Polling mechanism
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchPrompts();
+    }, POLLING_INTERVAL);
+
+    return () => clearInterval(interval);
+  }, [fetchPrompts]);
+
   return (
-    <Container maxWidth="lg">
-      <Box
-        sx={{
-          my: 4,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '80vh',
-        }}
-      >
-        <Paper
-          elevation={3}
-          sx={{
-            p: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 3,
-            maxWidth: 600,
-          }}
-        >
-          <DashboardIcon sx={{ fontSize: 60, color: 'primary.main' }} />
-          <Typography variant="h3" component="h1" gutterBottom>
-            LLM Dashboard
-          </Typography>
-          <Typography variant="body1" color="text.secondary" align="center">
-            Welcome to your LLM Dashboard. This is a Next.js application with
-            Material UI.
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-            <Button variant="contained" color="primary">
-              Get Started
-            </Button>
-            <Button variant="outlined" color="primary">
-              Learn More
-            </Button>
-          </Box>
-        </Paper>
-      </Box>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Header promptCount={prompts.length} onRefresh={handleRefresh} />
+      <NewPrompt onSubmit={handleSubmitPrompt} isSubmitting={isSubmitting} />
+      {!isLoading && (
+        <PromptList prompts={prompts} onDelete={handleDeletePrompt} />
+      )}
     </Container>
   );
 }
