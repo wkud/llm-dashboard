@@ -26,6 +26,5 @@ public class PromptConfiguration : IEntityTypeConfiguration<Prompt>
 
         builder.HasIndex(p => p.Status);
         builder.HasIndex(p => p.CreatedAt);
-        builder.HasIndex(p => p.UpdatedAt);
     }
 }
