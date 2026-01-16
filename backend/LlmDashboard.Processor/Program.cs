@@ -40,14 +40,12 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
-builder.Services.AddScoped<ILlmClient, DummyLlmClient>();
-
 var host = builder.Build();
 
 try
 {
     Log.Information("Starting processor application");
-    host.Run();
+    await host.RunAsync();
 }
 catch (Exception ex)
 {
@@ -55,5 +53,5 @@ catch (Exception ex)
 }
 finally
 {
-    Log.CloseAndFlush();
+    await Log.CloseAndFlushAsync();
 }
