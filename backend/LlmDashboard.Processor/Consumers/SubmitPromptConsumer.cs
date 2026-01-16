@@ -1,9 +1,8 @@
 using LlmDashboard.Application.Services;
-using LlmDashboard.Contracts.Messages;
 using LlmDashboard.Contracts.Messages.Prompts;
+using LlmDashboard.Domain.Enums;
 using LlmDashboard.Processor.Clients;
 using MassTransit;
-using Microsoft.Extensions.Logging;
 
 namespace LlmDashboard.Processor.Consumers;
 
@@ -13,8 +12,7 @@ public class SubmitPromptConsumer : IConsumer<SubmitPromptCommand>
     private readonly ILlmClient _llm;
     private readonly ILogger<SubmitPromptConsumer> _logger;
 
-    public SubmitPromptConsumer(
-        IPromptService promptService,
+    public SubmitPromptConsumer(IPromptService promptService,
         ILlmClient llm,
         ILogger<SubmitPromptConsumer> logger)
     {
@@ -29,7 +27,7 @@ public class SubmitPromptConsumer : IConsumer<SubmitPromptCommand>
 
         _logger.LogDebug("Processing prompt {PromptId}", promptId);
 
-        var promptDto = await _promptService.GetByIdAsync(promptId);
+        var promptDto = await _promptService.GetByIdAsync(promptId, context.CancellationToken);
 
         if (promptDto == null)
         {
@@ -37,7 +35,7 @@ public class SubmitPromptConsumer : IConsumer<SubmitPromptCommand>
             return;
         }
 
-        if (promptDto.Status != Domain.Enums.PromptStatus.Pending)
+        if (promptDto.Status != PromptStatus.Pending)
         {
             _logger.LogInformation("Prompt {PromptId} already processed or in progress", promptId);
             return;
@@ -45,19 +43,26 @@ public class SubmitPromptConsumer : IConsumer<SubmitPromptCommand>
 
         try
         {
-            await _promptService.MarkProcessingAsync(promptId);
+            await _promptService.MarkProcessingAsync(promptId, context.CancellationToken);
 
-            var result = await _llm.ProcessAsync(promptDto.Text);
+            var result = await _llm.ProcessAsync(promptDto.Text, context.CancellationToken);
 
-            await _promptService.MarkCompletedAsync(promptId, result);
+            if (string.IsNullOrWhiteSpace(result))
+            {
+                _logger.LogWarning("Prompt {PromptId} not processed", promptId);
+                await _promptService.MarkFailedAsync(promptId, "Prompt {PromptId} not processed due to the empty output", context.CancellationToken);
+                return;
+            }
+            
+            await _promptService.MarkCompletedAsync(promptId, result, context.CancellationToken);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed processing prompt {PromptId}", promptId);
 
-            await _promptService.MarkFailedAsync(promptId, ex.Message);
+            await _promptService.MarkFailedAsync(promptId, ex.Message, context.CancellationToken);
 
-            throw; // Let MassTransit handle retry / error queue
+            throw;
         }
     }
 }

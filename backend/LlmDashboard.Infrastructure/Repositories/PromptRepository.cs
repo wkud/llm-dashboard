@@ -43,7 +43,7 @@ public class PromptRepository : IPromptRepository
     {
         _logger.LogInformation("Adding prompt to database with ID: {PromptId}", prompt.Id);
 
-        await _db.Prompts.AddAsync(prompt, ct);
+        _db.Prompts.Add(prompt);
         await _db.SaveChangesAsync(ct);
 
         _logger.LogInformation("Successfully persisted prompt with ID: {PromptId}", prompt.Id);

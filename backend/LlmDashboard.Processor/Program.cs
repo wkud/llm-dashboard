@@ -13,6 +13,11 @@ builder.Services.AddSerilog((services, loggerConfiguration) =>
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
+builder.Services.AddHttpClient<ILlmClient, OllamaLlmClient>();
+
+// Register MassTransit-based event bus (requires MassTransit to be configured)
+builder.Services.AddScoped<LlmDashboard.Application.Abstractions.IEventBus, LlmDashboard.Infrastructure.Messaging.MassTransitEventBus>();
+
 builder.Services.AddMassTransit(x =>
 {
     x.SetKebabCaseEndpointNameFormatter();
@@ -35,14 +40,12 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
-builder.Services.AddScoped<ILlmClient, DummyLlmClient>();
-
 var host = builder.Build();
 
 try
 {
     Log.Information("Starting processor application");
-    host.Run();
+    await host.RunAsync();
 }
 catch (Exception ex)
 {
@@ -50,5 +53,5 @@ catch (Exception ex)
 }
 finally
 {
-    Log.CloseAndFlush();
+    await Log.CloseAndFlushAsync();
 }

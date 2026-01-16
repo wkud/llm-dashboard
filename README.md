@@ -6,6 +6,7 @@
 - Docker & Docker Compose
 - PostgreSQL (via Docker)
 - RabbitMQ (via Docker)
+- Ollama (via Docker)
 
 ## Getting Started
 
@@ -26,6 +27,7 @@ Edit `.env` with your preferred credentials. The `.env` file is used by Docker C
 - `POSTGRES_PORT` - PostgreSQL host port (default: 5433)
 - `RABBITMQ_USER` - RabbitMQ username (default: guest)
 - `RABBITMQ_PASSWORD` - RabbitMQ password (default: guest)
+- `OLLAMA_MODEL` - Ollama model to use (default: llama3.2)
 
 ### 2. .NET User Secrets Setup (Local Development)
 
@@ -43,6 +45,8 @@ cd backend/LlmDashboard.Processor
 dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5433;Database=llmdashboard;Username=llmuser;Password=change_this_password"
 dotnet user-secrets set "RabbitMQ:Username" "guest"
 dotnet user-secrets set "RabbitMQ:Password" "guest"
+dotnet user-secrets set "Ollama:BaseUrl" "http://localhost:11434"
+dotnet user-secrets set "Ollama:Model" "llama3.2"
 ```
 
 **Important Notes:**
@@ -114,9 +118,38 @@ dotnet ef migrations script --startup-project ../LlmDashboard.Api
 
 ### 4. Running with Docker Compose
 
-Start all services (API + Processor + PostgreSQL + RabbitMQ):
+Start all services (API + Processor + PostgreSQL + RabbitMQ + Ollama):
 
 ```bash
+docker-compose up -d
+```
+
+**First-time startup:** The system includes an automatic initialization process:
+
+1. `ollama-init` service starts first and pulls the model (may take several minutes)
+2. You can see the progress by running `docker-compose logs -f ollama-init`
+2. Once the model is pulled, `ollama-init` exits successfully
+3. The main `ollama` service starts
+4. Finally, `api` and `processor` services start after all dependencies are healthy
+
+To monitor the initialization progress:
+
+```bash
+docker-compose logs -f ollama-init
+```
+
+To check the status of all services:
+
+```bash
+docker-compose ps
+```
+
+The model is stored in a persistent volume, so it only downloads once. Subsequent runs will skip the download.
+
+To use a different model, update the `OLLAMA_MODEL` in your `.env` file and restart:
+
+```bash
+docker-compose down
 docker-compose up -d
 ```
 
@@ -135,9 +168,14 @@ docker-compose up -d
 - Management UI: http://localhost:15672
 - Default credentials: guest/guest (configurable in .env)
 
+**Ollama** - LLM inference engine
+- API Port: 11434
+- Default model: llama3.2 (configurable in .env)
+
 **Processor** - Background worker for processing tasks
 - Runs as a background service
 - Consumes messages from RabbitMQ
+- Communicates with Ollama for LLM inference
 
 Stop all services:
 
@@ -155,10 +193,17 @@ docker-compose down -v
 
 If you want to run the API or Processor locally while using Dockerized services:
 
-1. Start the required services (PostgreSQL and RabbitMQ):
+1. Start the required services (PostgreSQL, RabbitMQ, and Ollama):
 ```bash
-docker-compose up postgres rabbitmq -d
+docker-compose up  postgres rabbitmq ollama ollama-init -d
 ```
+
+Monitor the initialization:
+```bash
+docker-compose logs -f ollama-init
+```
+
+Wait for the "✓ OLLAMA INITIALIZATION COMPLETE" message.
 
 2. Run the API from your IDE or command line:
 ```bash
@@ -216,6 +261,13 @@ The API will use the connection string from user secrets (pointing to `localhost
                 │                     ▼                 │
                 │          ┌────────────────────────┐   │
                 └──────────│ LlmDashboard.Processor │───│   
+                           └───────────┬────────────┘   │ References
+                                       │ Sends prompts  │ shared libs
+                                       │ via HTTP       │
+                                       ▼                │
+                           ┌────────────────────────┐   │
+                           │        Ollama          │   │
+                           │     (Port 11434)       │   │
                            └────────────────────────┘   │
                                                         │
                            ┌─────────────────────┬──────┴───┬────────────────────┐
