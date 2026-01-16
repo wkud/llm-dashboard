@@ -1,9 +1,7 @@
 ﻿using LlmDashboard.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace LlmDashboard.Infrastructure;
-
-using LlmDashboard.Domain;
-using Microsoft.EntityFrameworkCore;
 
 public class ApplicationDbContext : DbContext
 {

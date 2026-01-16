@@ -21,7 +21,7 @@ public class PromptRepository : IPromptRepository
     {
         _logger.LogDebug("Querying database for prompt with ID: {PromptId}", id);
 
-        var prompt = await _db.Prompts.FindAsync(new object[] { id }, ct);
+        var prompt = await _db.Prompts.FindAsync([id], ct);
 
         _logger.LogDebug("Database query completed for prompt ID: {PromptId}, Found: {Found}", id, prompt is not null);
         return prompt;

@@ -1,6 +1,8 @@
 using LlmDashboard.Application.Abstractions;
 using LlmDashboard.Infrastructure.Messaging;
+using LlmDashboard.Infrastructure.Options;
 using LlmDashboard.Infrastructure.Repositories;
+using Microsoft.Extensions.Options;
 
 namespace LlmDashboard.Infrastructure;
 
@@ -15,16 +17,20 @@ public static class DependencyInjection
         var connectionString = configuration.GetConnectionString("DefaultConnection")
                                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-        services.AddDbContext<ApplicationDbContext>(options =>
+        services.AddDbContext<ApplicationDbContext>((sp, options) =>
+        {
+            var databaseOptions = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
+
             options.UseNpgsql(connectionString, npgsqlOptions =>
                 {
                     npgsqlOptions.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName);
                     npgsqlOptions.EnableRetryOnFailure(
-                        maxRetryCount: 3,
-                        maxRetryDelay: TimeSpan.FromSeconds(30),
+                        maxRetryCount: databaseOptions.MaxRetryCount,
+                        maxRetryDelay: databaseOptions.MaxRetryDelay,
                         errorCodesToAdd: null);
                 })
-                .UseSnakeCaseNamingConvention());
+                .UseSnakeCaseNamingConvention();
+        });
 
         services.AddScoped<IPromptRepository, PromptRepository>();
         services.AddScoped<IEventBus, MassTransitEventBus>();

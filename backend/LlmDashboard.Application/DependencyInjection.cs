@@ -1,3 +1,4 @@
+using LlmDashboard.Application.Abstractions;
 using LlmDashboard.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 

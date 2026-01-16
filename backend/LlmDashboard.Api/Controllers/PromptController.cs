@@ -1,4 +1,4 @@
-using LlmDashboard.Api.Dtos;
+using LlmDashboard.Application.Abstractions;
 using LlmDashboard.Application.Dtos.Prompt;
 using LlmDashboard.Application.Services;
 using Microsoft.AspNetCore.Mvc;
