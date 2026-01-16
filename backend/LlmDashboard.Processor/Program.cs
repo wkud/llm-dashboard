@@ -1,8 +1,11 @@
 using LlmDashboard.Application;
+using LlmDashboard.Application.Abstractions;
 using LlmDashboard.Infrastructure;
-using LlmDashboard.Processor;
+using LlmDashboard.Infrastructure.Messaging;
+using LlmDashboard.Infrastructure.Options;
 using LlmDashboard.Processor.Clients;
 using MassTransit;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -13,10 +16,23 @@ builder.Services.AddSerilog((services, loggerConfiguration) =>
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
-builder.Services.AddHttpClient<ILlmClient, OllamaLlmClient>();
+builder.Services.Configure<OllamaOptions>(
+    builder.Configuration.GetSection(OllamaOptions.SectionName));
 
-// Register MassTransit-based event bus (requires MassTransit to be configured)
-builder.Services.AddScoped<LlmDashboard.Application.Abstractions.IEventBus, LlmDashboard.Infrastructure.Messaging.MassTransitEventBus>();
+builder.Services.Configure<RabbitMqOptions>(
+    builder.Configuration.GetSection(RabbitMqOptions.SectionName));
+
+
+builder.Services.AddHttpClient<ILlmClient, OllamaLlmClient>((sp, client) =>
+{
+    var options = sp.GetRequiredService<IOptions<OllamaOptions>>().Value;
+
+    client.BaseAddress = new Uri(options.BaseUrl);
+    client.Timeout = options.Timeout;
+});
+
+
+builder.Services.AddScoped<IEventBus, MassTransitEventBus>();
 
 builder.Services.AddMassTransit(x =>
 {
@@ -26,14 +42,12 @@ builder.Services.AddMassTransit(x =>
 
     x.UsingRabbitMq((context, cfg) =>
     {
-        var rabbitMqHost = builder.Configuration["RabbitMQ:Host"] ?? "localhost";
-        var rabbitMqUsername = builder.Configuration["RabbitMQ:Username"] ?? "guest";
-        var rabbitMqPassword = builder.Configuration["RabbitMQ:Password"] ?? "guest";
+        var options = context.GetRequiredService<IOptions<RabbitMqOptions>>().Value;
 
-        cfg.Host(rabbitMqHost, h =>
+        cfg.Host(options.Host, h =>
         {
-            h.Username(rabbitMqUsername);
-            h.Password(rabbitMqPassword);
+            h.Username(options.Username);
+            h.Password(options.Password);
         });
 
         cfg.ConfigureEndpoints(context);
