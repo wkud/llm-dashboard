@@ -199,26 +199,26 @@ The API will use the connection string from user secrets (pointing to `localhost
                         ▼
               ┌──────────────────┐
               │ LlmDashboard.Api │
-              │   (Port 8080)    │
-              └────┬─────────┬───┘
-                   │         │
-         Reads/    │         │ Publishes
-         Writes    │         │ Messages
-                   ▼         ▼
-         ┌──────────────┐  ┌─────────────────────┐
-         │  PostgreSQL  │  │      RabbitMQ       │
-         │ (Port 5433)  │  │  (Port 5672)        │
-         └──────┬───────┘  │  UI: localhost:15672│
-                │          └──────────┬──────────┘
-                │                     │ Consumes
-         Reads/ │                     │ Messages
-         Writes │                     │
-                │                     ▼
-                │          ┌────────────────────────┐
-                └──────────│ LlmDashboard.Processor │
-                           └────────────────────────┘
-                                      │
-                           ┌──────────┴──────────┬──────────┬────────────────────┐
+              │   (Port 8080)    │──────────────────────┐
+              └────┬─────────┬───┘                      │
+                   │         │                          │
+         Reads/    │         │ Publishes                │
+         Writes    │         │ Messages                 │
+                   ▼         ▼                          │
+         ┌──────────────┐  ┌─────────────────────┐      │ References 
+         │  PostgreSQL  │  │      RabbitMQ       │      │ shared libs
+         │ (Port 5433)  │  │  (Port 5672)        │      │
+         └──────┬───────┘  │  UI: localhost:15672│      │
+                │          └──────────┬──────────┘      │
+                │                     │ Consumes        │
+         Reads/ │                     │ Messages        │
+         Writes │                     │                 │
+                │                     ▼                 │
+                │          ┌────────────────────────┐   │
+                └──────────│ LlmDashboard.Processor │───│   
+                           └────────────────────────┘   │
+                                                        │
+                           ┌─────────────────────┬──────┴───┬────────────────────┐
                            ▼                     ▼          ▼                    ▼
                   ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐  ┌──────────────┐
                   │  Application │  │  Contracts   │  │  Infrastructure  │  │    Domain    │
