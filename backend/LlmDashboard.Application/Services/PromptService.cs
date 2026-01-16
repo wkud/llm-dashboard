@@ -1,4 +1,3 @@
-using LlmDashboard.Api.Dtos;
 using LlmDashboard.Application.Abstractions;
 using LlmDashboard.Application.Dtos.Prompt;
 using LlmDashboard.Contracts.Messages.Prompts;
@@ -67,28 +66,6 @@ public class PromptService : IPromptService
         _logger.LogInformation("Retrieved {Count} prompts", prompts.Count());
 
         return prompts.Select(MapToDto);
-    }
-
-    public async Task<PromptDto?> UpdateAsync(Guid id, UpdatePromptDto dto, CancellationToken ct = default)
-    {
-        _logger.LogInformation("Updating prompt with ID: {PromptId}", id);
-
-        var prompt = await _repository.GetByIdAsync(id, ct);
-        if (prompt is null)
-        {
-            _logger.LogWarning("Prompt with ID: {PromptId} not found for update", id);
-            return null;
-        }
-
-        prompt.Text = dto.Text;
-        prompt.Status = dto.Status;
-        prompt.UpdatedAt = DateTime.UtcNow;
-
-        await _repository.UpdateAsync(prompt, ct);
-
-        _logger.LogInformation("Successfully updated prompt with ID: {PromptId}", id);
-
-        return MapToDto(prompt);
     }
 
     public async Task<bool> DeleteAsync(Guid id, CancellationToken ct = default)

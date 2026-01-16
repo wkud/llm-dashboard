@@ -1,4 +1,3 @@
-using LlmDashboard.Api.Dtos;
 using LlmDashboard.Application.Dtos.Prompt;
 using LlmDashboard.Application.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -35,13 +34,6 @@ public class PromptController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PromptDto>>> GetMany()
         => Ok(await _service.GetManyAsync());
-
-    [HttpPut("{id:guid}")]
-    public async Task<ActionResult<PromptDto>> Update(Guid id, [FromBody] UpdatePromptDto dto)
-    {
-        var promptDto = await _service.UpdateAsync(id, dto);
-        return promptDto is null ? NotFound() : Ok(promptDto);
-    }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
