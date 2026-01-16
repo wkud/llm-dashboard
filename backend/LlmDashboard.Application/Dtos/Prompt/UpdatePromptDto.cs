@@ -1,6 +1,6 @@
 using LlmDashboard.Domain.Enums;
 
-namespace LlmDashboard.Api.Dtos;
+namespace LlmDashboard.Application.Dtos.Prompt;
 
 public record UpdatePromptDto
 {

@@ -1,8 +1,10 @@
 using System.Text.Json.Serialization;
 using LlmDashboard.Application;
 using LlmDashboard.Infrastructure;
+using LlmDashboard.Infrastructure.Options;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,25 +24,28 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 });
 
 builder.Services.AddOpenApi();
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
+builder.Services.Configure<RabbitMqOptions>(
+    builder.Configuration.GetSection(RabbitMqOptions.SectionName));
+
+builder.Services.Configure<DatabaseOptions>(
+    builder.Configuration.GetSection(DatabaseOptions.SectionName));
+
 builder.Services.AddMassTransit(x =>
 {
     x.UsingRabbitMq((context, cfg) =>
     {
-        var rabbitMqHost = builder.Configuration["RabbitMQ:Host"] ?? "localhost";
-        var rabbitMqUsername = builder.Configuration["RabbitMQ:Username"] ?? "guest";
-        var rabbitMqPassword = builder.Configuration["RabbitMQ:Password"] ?? "guest";
+        var options = context.GetRequiredService<IOptions<RabbitMqOptions>>().Value;
 
-        cfg.Host(rabbitMqHost, h =>
+        cfg.Host(options.Host, h =>
         {
-            h.Username(rabbitMqUsername);
-            h.Password(rabbitMqPassword);
+            h.Username(options.Username);
+            h.Password(options.Password);
         });
     });
 });
@@ -73,9 +78,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 try

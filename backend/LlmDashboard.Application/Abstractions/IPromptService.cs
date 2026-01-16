@@ -1,7 +1,6 @@
-using LlmDashboard.Api.Dtos;
 using LlmDashboard.Application.Dtos.Prompt;
 
-namespace LlmDashboard.Application.Services;
+namespace LlmDashboard.Application.Abstractions;
 
 public interface IPromptService
 {
