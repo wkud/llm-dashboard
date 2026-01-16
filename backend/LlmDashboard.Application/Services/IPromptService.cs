@@ -1,4 +1,3 @@
-using LlmDashboard.Api.Dtos;
 using LlmDashboard.Application.Dtos.Prompt;
 
 namespace LlmDashboard.Application.Services;
