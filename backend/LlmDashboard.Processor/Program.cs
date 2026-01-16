@@ -13,6 +13,11 @@ builder.Services.AddSerilog((services, loggerConfiguration) =>
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
+builder.Services.AddHttpClient<ILlmClient, OllamaLlmClient>();
+
+// Register MassTransit-based event bus (requires MassTransit to be configured)
+builder.Services.AddScoped<LlmDashboard.Application.Abstractions.IEventBus, LlmDashboard.Infrastructure.Messaging.MassTransitEventBus>();
+
 builder.Services.AddMassTransit(x =>
 {
     x.SetKebabCaseEndpointNameFormatter();
