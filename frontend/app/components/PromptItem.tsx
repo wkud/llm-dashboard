@@ -25,15 +25,46 @@ interface PromptItemProps {
 const getStatusColor = (status: PromptStatus): 'default' | 'primary' | 'success' | 'error' | 'warning' => {
   switch (status) {
     case PromptStatus.Pending:
-      return 'default';
+      return 'primary'; // Blue
     case PromptStatus.Processing:
-      return 'primary';
+      return 'warning'; // Amber
     case PromptStatus.Completed:
-      return 'success';
+      return 'success'; // Green
     case PromptStatus.Failed:
-      return 'error';
+      return 'error'; // Red
     default:
       return 'default';
+  }
+};
+
+const getStatusChipStyles = (status: PromptStatus) => {
+  switch (status) {
+    case PromptStatus.Pending:
+      return {
+        backgroundColor: 'rgba(59, 130, 246, 0.15)',
+        color: '#3b82f6',
+        border: '1px solid rgba(59, 130, 246, 0.3)',
+      };
+    case PromptStatus.Processing:
+      return {
+        backgroundColor: 'rgba(245, 158, 11, 0.15)',
+        color: '#f59e0b',
+        border: '1px solid rgba(245, 158, 11, 0.3)',
+      };
+    case PromptStatus.Completed:
+      return {
+        backgroundColor: 'rgba(16, 185, 129, 0.15)',
+        color: '#10b981',
+        border: '1px solid rgba(16, 185, 129, 0.3)',
+      };
+    case PromptStatus.Failed:
+      return {
+        backgroundColor: 'rgba(239, 68, 68, 0.15)',
+        color: '#ef4444',
+        border: '1px solid rgba(239, 68, 68, 0.3)',
+      };
+    default:
+      return {};
   }
 };
 
@@ -78,9 +109,25 @@ export default function PromptItem({ prompt, onDelete }: PromptItemProps) {
       sx={{
         p: 3,
         mb: 2,
-        backgroundColor: 'background.paper',
-        border: '1px solid',
-        borderColor: 'divider',
+        backgroundColor: 'rgba(30, 41, 59, 0.6)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        border: '1px solid rgba(148, 163, 184, 0.1)',
+        animation: 'fadeIn 0.3s ease-in',
+        '@keyframes fadeIn': {
+          from: {
+            opacity: 0,
+            transform: 'translateY(8px)',
+          },
+          to: {
+            opacity: 1,
+            transform: 'translateY(0)',
+          },
+        },
+        '&:hover': {
+          borderColor: 'rgba(148, 163, 184, 0.2)',
+          transform: 'translateY(-2px)',
+        },
       }}
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
@@ -88,8 +135,13 @@ export default function PromptItem({ prompt, onDelete }: PromptItemProps) {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
             <Chip
               label={getStatusLabel(prompt.status)}
-              color={getStatusColor(prompt.status)}
               size="small"
+              sx={{
+                ...getStatusChipStyles(prompt.status),
+                fontWeight: 500,
+                fontSize: '0.75rem',
+                height: 24,
+              }}
             />
             {showExpandButton && (
               <IconButton
@@ -118,9 +170,14 @@ export default function PromptItem({ prompt, onDelete }: PromptItemProps) {
             disabled={isDeleting}
             sx={{
               color: 'text.secondary',
-              '&:hover': {
-                color: 'error.main',
-                backgroundColor: 'action.hover',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              '&:hover:not(:disabled)': {
+                color: '#ef4444',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                transform: 'scale(1.1)',
+              },
+              '&:disabled': {
+                opacity: 0.5,
               },
             }}
           >
@@ -129,20 +186,30 @@ export default function PromptItem({ prompt, onDelete }: PromptItemProps) {
         </Tooltip>
       </Box>
 
-      <Collapse in={expanded}>
+      <Collapse in={expanded} timeout="auto">
         <Box
           sx={{
             mt: 2,
             p: 2,
-            backgroundColor: 'background.default',
-            borderRadius: 1,
-            border: '1px solid',
-            borderColor: 'divider',
+            backgroundColor: 'rgba(15, 23, 42, 0.5)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            borderRadius: 2,
+            border: '1px solid rgba(148, 163, 184, 0.1)',
+            transition: 'all 0.2s ease',
           }}
         >
           {hasResult && (
             <Box>
-              <Typography variant="subtitle2" color="success.main" gutterBottom>
+              <Typography 
+                variant="subtitle2" 
+                gutterBottom
+                sx={{ 
+                  color: '#10b981',
+                  fontWeight: 600,
+                  mb: 1,
+                }}
+              >
                 Result:
               </Typography>
               <Typography
@@ -151,6 +218,7 @@ export default function PromptItem({ prompt, onDelete }: PromptItemProps) {
                   color: 'text.primary',
                   whiteSpace: 'pre-wrap',
                   wordBreak: 'break-word',
+                  lineHeight: 1.6,
                 }}
               >
                 {prompt.outputText}
@@ -159,15 +227,24 @@ export default function PromptItem({ prompt, onDelete }: PromptItemProps) {
           )}
           {hasError && (
             <Box>
-              <Typography variant="subtitle2" color="error.main" gutterBottom>
+              <Typography 
+                variant="subtitle2" 
+                gutterBottom
+                sx={{ 
+                  color: '#ef4444',
+                  fontWeight: 600,
+                  mb: 1,
+                }}
+              >
                 Error:
               </Typography>
               <Typography
                 variant="body2"
                 sx={{
-                  color: 'error.main',
+                  color: '#ef4444',
                   whiteSpace: 'pre-wrap',
                   wordBreak: 'break-word',
+                  lineHeight: 1.6,
                 }}
               >
                 {prompt.errorMessage}

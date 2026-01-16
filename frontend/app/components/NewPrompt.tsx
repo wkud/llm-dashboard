@@ -42,9 +42,14 @@ export default function NewPrompt({ onSubmit, isSubmitting }: NewPromptProps) {
       sx={{
         p: 3,
         mb: 4,
-        backgroundColor: 'background.paper',
-        border: '1px solid',
-        borderColor: 'divider',
+        backgroundColor: 'rgba(30, 41, 59, 0.6)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        border: '1px solid rgba(148, 163, 184, 0.1)',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        '&:hover': {
+          borderColor: 'rgba(148, 163, 184, 0.2)',
+        },
       }}
     >
       <Typography variant="h6" component="h2" gutterBottom sx={{ mb: 2 }}>
@@ -62,19 +67,27 @@ export default function NewPrompt({ onSubmit, isSubmitting }: NewPromptProps) {
         sx={{
           mb: 2,
           '& .MuiOutlinedInput-root': {
-            backgroundColor: 'background.default',
+            backgroundColor: 'rgba(15, 23, 42, 0.5)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            transition: 'all 0.2s ease',
             '& fieldset': {
-              borderColor: 'divider',
+              borderColor: 'rgba(148, 163, 184, 0.1)',
             },
             '&:hover fieldset': {
-              borderColor: 'divider',
+              borderColor: 'rgba(148, 163, 184, 0.2)',
             },
             '&.Mui-focused fieldset': {
-              borderColor: 'primary.main',
+              borderColor: '#3b82f6',
+              borderWidth: '2px',
             },
           },
           '& .MuiInputBase-input': {
             color: 'text.primary',
+            '&::placeholder': {
+              color: 'text.secondary',
+              opacity: 0.6,
+            },
           },
         }}
       />
@@ -89,6 +102,18 @@ export default function NewPrompt({ onSubmit, isSubmitting }: NewPromptProps) {
           startIcon={<SendIcon />}
           sx={{
             textTransform: 'none',
+            fontWeight: 500,
+            borderRadius: 2,
+            px: 3,
+            py: 1,
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+            '&:hover:not(:disabled)': {
+              transform: 'translateY(-1px)',
+              boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+            },
+            '&:disabled': {
+              opacity: 0.5,
+            },
           }}
         >
           Submit Prompt

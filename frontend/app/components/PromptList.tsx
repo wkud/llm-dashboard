@@ -2,7 +2,7 @@
 
 import { Box, Typography, Paper } from '@mui/material';
 import { Inbox as InboxIcon } from '@mui/icons-material';
-import { Prompt } from '@/types/prompt';
+import { Prompt } from '../lib/types/prompt';
 import PromptItem from './PromptItem';
 
 interface PromptListProps {
@@ -18,9 +18,19 @@ export default function PromptList({ prompts, onDelete }: PromptListProps) {
         sx={{
           p: 6,
           textAlign: 'center',
-          backgroundColor: 'background.paper',
-          border: '1px solid',
-          borderColor: 'divider',
+          backgroundColor: 'rgba(30, 41, 59, 0.6)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          border: '1px solid rgba(148, 163, 184, 0.1)',
+          animation: 'fadeIn 0.4s ease-in',
+          '@keyframes fadeIn': {
+            from: {
+              opacity: 0,
+            },
+            to: {
+              opacity: 1,
+            },
+          },
         }}
       >
         <InboxIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />

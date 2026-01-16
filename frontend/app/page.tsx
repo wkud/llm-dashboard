@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Container, Box } from '@mui/material';
+import { Box, Container } from '@mui/material';
 import { Prompt } from './lib/types/prompt';
 import { apiService } from './lib/services/api';
 import Header from './components/Header';
@@ -74,12 +74,20 @@ export default function Home() {
   }, [fetchPrompts]);
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Header promptCount={prompts.length} onRefresh={handleRefresh} />
-      <NewPrompt onSubmit={handleSubmitPrompt} isSubmitting={isSubmitting} />
-      {!isLoading && (
-        <PromptList prompts={prompts} onDelete={handleDeletePrompt} />
-      )}
-    </Container>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundColor: '#0f172a', // Deep slate/navy background
+        backgroundImage: 'radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%)',
+      }}
+    >
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Header promptCount={prompts.length} onRefresh={handleRefresh} />
+        <NewPrompt onSubmit={handleSubmitPrompt} isSubmitting={isSubmitting} />
+        {!isLoading && (
+          <PromptList prompts={prompts} onDelete={handleDeletePrompt} />
+        )}
+      </Container>
+    </Box>
   );
 }
