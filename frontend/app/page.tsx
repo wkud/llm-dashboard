@@ -18,11 +18,7 @@ export default function Home() {
   const fetchPrompts = useCallback(async () => {
     try {
       const fetchedPrompts = await apiService.getAllPrompts();
-      // Sort by createdAt descending (newest first)
-      const sorted = fetchedPrompts.sort(
-        (a: Prompt, b: Prompt) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-      setPrompts(sorted);
+      setPrompts(fetchedPrompts);
     } catch (error) {
       console.error('Failed to fetch prompts:', error);
     } finally {
@@ -34,7 +30,6 @@ export default function Home() {
     setIsSubmitting(true);
     try {
       await apiService.createPrompt({ text });
-      // Refresh prompts after creating
       await fetchPrompts();
     } catch (error) {
       console.error('Failed to submit prompt:', error);
@@ -47,7 +42,6 @@ export default function Home() {
   const handleDeletePrompt = useCallback(async (id: string) => {
     try {
       await apiService.deletePrompt(id);
-      // Refresh prompts after deleting
       await fetchPrompts();
     } catch (error) {
       console.error('Failed to delete prompt:', error);
@@ -59,12 +53,10 @@ export default function Home() {
     fetchPrompts();
   }, [fetchPrompts]);
 
-  // Initial fetch
   useEffect(() => {
     fetchPrompts();
   }, [fetchPrompts]);
 
-  // Polling mechanism
   useEffect(() => {
     const interval = setInterval(() => {
       fetchPrompts();
@@ -77,7 +69,7 @@ export default function Home() {
     <Box
       sx={{
         minHeight: '100vh',
-        backgroundColor: '#0f172a', // Deep slate/navy background
+        backgroundColor: '#0f172a',
         backgroundImage: 'radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%)',
       }}
     >

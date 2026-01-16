@@ -36,14 +36,6 @@ Open [http://localhost:3000](http://localhost:3000)
 - `npm start` - Start production server
 - `npm run lint` - Run ESLint
 
-## API Endpoints
-
-Base URL: `http://localhost:8080` (configurable via `NEXT_PUBLIC_API_URL`)
-
-- `GET /api/prompt` - Get all prompts
-- `POST /api/prompt` - Create prompt `{ "text": "..." }`
-- `DELETE /api/prompt/{id}` - Delete prompt
-
 ## Project Structure
 
 ```
@@ -58,8 +50,4 @@ app/
 
 ## Deployment
 
-Deploy to Vercel, Netlify, or any Next.js-compatible platform. Set `NEXT_PUBLIC_API_URL` environment variable.
-
----
-
-Built with Next.js and Material UI
+Deploy to any Next.js-compatible platform. Set `NEXT_PUBLIC_API_URL` environment variable.
