@@ -1,6 +1,7 @@
 using LlmDashboard.Api.Dtos;
 using LlmDashboard.Application.Abstractions;
 using LlmDashboard.Application.Dtos.Prompt;
+using LlmDashboard.Application.Exceptions;
 using LlmDashboard.Contracts.Messages.Prompts;
 using LlmDashboard.Domain.Enums;
 using LlmDashboard.Domain.Models;
@@ -117,16 +118,16 @@ public class PromptService : IPromptService
         if (prompt == null)
         {
             _logger.LogWarning("Prompt {PromptId} not found for marking as processing", id);
-            throw new KeyNotFoundException($"Prompt {id} not found");
+            throw new NotFoundException($"Prompt {id} not found");
         }
 
-        if (prompt.Status != Domain.Enums.PromptStatus.Pending)
+        if (prompt.Status != PromptStatus.Pending)
         {
             _logger.LogWarning("Cannot mark prompt {PromptId} as processing - current status is {Status}", id, prompt.Status);
             throw new InvalidOperationException("Prompt must be pending to start processing");
         }
 
-        prompt.Status = Domain.Enums.PromptStatus.Processing;
+        prompt.Status = PromptStatus.Processing;
         prompt.UpdatedAt = DateTime.UtcNow;
         prompt.ErrorMessage = null;
 
@@ -143,10 +144,10 @@ public class PromptService : IPromptService
         if (prompt == null)
         {
             _logger.LogWarning("Prompt {PromptId} not found for marking as completed", id);
-            throw new KeyNotFoundException($"Prompt {id} not found");
+            throw new NotFoundException($"Prompt {id} not found");
         }
 
-        prompt.Status = Domain.Enums.PromptStatus.Completed;
+        prompt.Status = PromptStatus.Completed;
         prompt.OutputText = output;
         prompt.UpdatedAt = DateTime.UtcNow;
 
@@ -163,10 +164,10 @@ public class PromptService : IPromptService
         if (prompt == null)
         {
             _logger.LogWarning("Prompt {PromptId} not found for marking as failed", id);
-            throw new KeyNotFoundException($"Prompt {id} not found");
+            throw new NotFoundException($"Prompt {id} not found");
         }
 
-        prompt.Status = Domain.Enums.PromptStatus.Failed;
+        prompt.Status = PromptStatus.Failed;
         prompt.ErrorMessage = error;
         prompt.UpdatedAt = DateTime.UtcNow;
 
