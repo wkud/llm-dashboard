@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using LlmDashboard.Application;
 using LlmDashboard.Infrastructure;
 using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,6 +46,22 @@ builder.Services.AddMassTransit(x =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    try
+    {
+        Log.Information("Applying database migrations...");
+        dbContext.Database.Migrate();
+        Log.Information("Database migrations applied successfully");
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "An error occurred while applying database migrations");
+        throw;
+    }
+}
 
 app.UseSerilogRequestLogging();
 

@@ -124,9 +124,29 @@ Start all services (API + Processor + PostgreSQL + RabbitMQ + Ollama):
 docker-compose up -d
 ```
 
-That's it! The Ollama model specified in your `.env` file (default: `llama3.2`) will be automatically pulled on first run. The model is stored in a persistent volume, so it only downloads once.
+**First-time startup:** The system includes an automatic initialization process:
 
-To use a different model, update the `OLLAMA_MODEL` in your `.env` file and restart the services:
+1. `ollama-init` service starts first and pulls the model (may take several minutes)
+2. You can see the progress by running `docker-compose logs -f ollama-init`
+2. Once the model is pulled, `ollama-init` exits successfully
+3. The main `ollama` service starts
+4. Finally, `api` and `processor` services start after all dependencies are healthy
+
+To monitor the initialization progress:
+
+```bash
+docker-compose logs -f ollama-init
+```
+
+To check the status of all services:
+
+```bash
+docker-compose ps
+```
+
+The model is stored in a persistent volume, so it only downloads once. Subsequent runs will skip the download.
+
+To use a different model, update the `OLLAMA_MODEL` in your `.env` file and restart:
 
 ```bash
 docker-compose down
@@ -175,10 +195,15 @@ If you want to run the API or Processor locally while using Dockerized services:
 
 1. Start the required services (PostgreSQL, RabbitMQ, and Ollama):
 ```bash
-docker-compose up postgres rabbitmq ollama -d
+docker-compose up  postgres rabbitmq ollama ollama-init -d
 ```
 
-The Ollama model will be automatically pulled on first run.
+Monitor the initialization:
+```bash
+docker-compose logs -f ollama-init
+```
+
+Wait for the "✓ OLLAMA INITIALIZATION COMPLETE" message.
 
 2. Run the API from your IDE or command line:
 ```bash
