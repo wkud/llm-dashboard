@@ -124,13 +124,14 @@ Start all services (API + Processor + PostgreSQL + RabbitMQ + Ollama):
 docker-compose up -d
 ```
 
-**Important:** On first run, you need to pull the Ollama model. After starting the services:
+That's it! The Ollama model specified in your `.env` file (default: `llama3.2`) will be automatically pulled on first run. The model is stored in a persistent volume, so it only downloads once.
+
+To use a different model, update the `OLLAMA_MODEL` in your `.env` file and restart the services:
 
 ```bash
-docker exec -it llm-dashboard-ollama ollama pull llama3.2
+docker-compose down
+docker-compose up -d
 ```
-
-You can use any model available in Ollama. To use a different model, update the `OLLAMA_MODEL` in your `.env` file and pull that model instead.
 
 **Services available:**
 
@@ -177,18 +178,15 @@ If you want to run the API or Processor locally while using Dockerized services:
 docker-compose up postgres rabbitmq ollama -d
 ```
 
-2. Pull the Ollama model (first time only):
-```bash
-docker exec -it llm-dashboard-ollama ollama pull llama3.2
-```
+The Ollama model will be automatically pulled on first run.
 
-3. Run the API from your IDE or command line:
+2. Run the API from your IDE or command line:
 ```bash
 cd backend/LlmDashboard.Api
 dotnet run
 ```
 
-4. Or run the Processor:
+3. Or run the Processor:
 ```bash
 cd backend/LlmDashboard.Processor
 dotnet run
