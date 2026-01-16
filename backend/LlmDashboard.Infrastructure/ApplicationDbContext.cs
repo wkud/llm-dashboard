@@ -1,11 +1,15 @@
-﻿namespace LlmDashboard.Infrastructure;
+﻿using LlmDashboard.Domain.Models;
+
+namespace LlmDashboard.Infrastructure;
 
 using LlmDashboard.Domain;
 using Microsoft.EntityFrameworkCore;
 
 public class ApplicationDbContext : DbContext
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    {
+    }
 
     public DbSet<Prompt> Prompts { get; set; } = null!;
 
